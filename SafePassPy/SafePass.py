@@ -46,7 +46,27 @@ __VERSION__ = "1.0"
 __CURRENT_PATH__ = os.getcwd()
 
 
-def __decompress_hashes_database(input_file: str = f"{__CURRENT_PATH__}\\hashes\\hashes.gz",
+def _collect_database(chunk_prefix: str = "hashes\\hashes_db", output_file: str = "hashes\\hashes_db.gz"):
+    """ This function will collect the chunks of the database and return the original database archive"""
+
+    # Define chunk count variable
+    chunk_count = 0
+
+    with open(output_file, 'wb') as f:
+
+        while True:
+            chunk_file = f"{chunk_prefix}{chunk_count}.bin"
+            try:
+                with open(chunk_file, 'rb') as chunk:
+                    f.write(chunk.read())
+
+            except FileNotFoundError:
+                break
+
+            chunk_count += 1
+
+
+def _decompress_hashes_database(input_file: str = f"{__CURRENT_PATH__}\\hashes\\hashes_db.gz",
                                  output_file: str = f"{__CURRENT_PATH__}\\hashes\\hashes.txtdb"):
     """ This function will decompress the .gz file that's contain hashes database"""
 
@@ -117,11 +137,18 @@ class SafePass:
         self.__password = password
         self.__hashed_password = self.__password_hashing(password)
 
+        # Collect database files
+        _collect_database()
+        # Decompress the database archive
+        _decompress_hashes_database()
+
         # Load hashes database
         self.__hashes = self.__load_hashes_db("hashes.txtdb")
 
         # Delete the decompressed file
         os.system(f"del {__CURRENT_PATH__}\\hashes\\hashes.txtdb")
+        # Delete the .gz archive file
+        os.system(f"del {__CURRENT_PATH__}\\hashes\\hashes_db.gz")
 
     @property
     def get_password_strength_percent(self) -> int:
@@ -346,7 +373,7 @@ class SafePass:
         with open(database_file, 'r', encoding="UTF-8") as file:
 
             # Set the latest update date using linecache module
-            self.__database_update = linecache.getline(database_file, 2).split()[-1]
+            self.__database_update = linecache.getline(database_file, 6).split()[-1]
 
             # Iter each line of the txtdb file
             for line in file:
@@ -376,5 +403,3 @@ class SafePass:
 
 if __name__ == "__main__":
     sys.exit()
-else:
-    __decompress_hashes_database()
