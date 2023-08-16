@@ -4,7 +4,7 @@
 
 <p>SafePassPy is a pure-python library used to secure passwords and determine the strength percentage of password also check the passwords breachs, and much more tools</p>
 
-<h3 align="center">Features</h3>
+<h2 align="center">Features</h2>
 
 - [x] Determine Password strength percentage
 - [x] Check your password for password breach through large passwords database 
