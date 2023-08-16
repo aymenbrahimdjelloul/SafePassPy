@@ -13,7 +13,7 @@
 <p>SafePassPy uses multiple methods to make you satisfied and feel secure, it uses multiple password measures that have been authorized from specialists in IT and Cyber-Security
 like Avast and Google, also SafePassPy uses a large passwords database to check password breachs through it</p>
 
-<h3 align="center">Usage</h3>
+<h3 align="center">Simple Usage</h3>
 
 ~~~python
 # First import SafePass module from SafePassPy
@@ -28,8 +28,11 @@ print(f"{password_checker.get_password_strength_percent} %")
 
 ~~~
 
+<h6>OUTPUT</h6>
 ~~~
-# OUTPUT : 25 %
+OUTPUT : 25 %
 ~~~
+
+<h3 align="center"></h3>
 
 
