@@ -29,6 +29,7 @@ print(f"{password_checker.get_password_strength_percent} %")
 ~~~
 
 <h6>OUTPUT</h6>
+
 ~~~
 OUTPUT : 25 %
 ~~~
