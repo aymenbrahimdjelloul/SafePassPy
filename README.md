@@ -34,7 +34,7 @@ print(f"{password_checker.get_password_strength_percent} %")
  25 %
 ~~~
 
-<h3 align="center">Avanced Usage</h3>
+<h3 align="center">Advanced Usage</h3>
 
 ~~~python
 
