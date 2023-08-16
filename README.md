@@ -31,9 +31,54 @@ print(f"{password_checker.get_password_strength_percent} %")
 <h6>OUTPUT</h6>
 
 ~~~
-OUTPUT : 25 %
+ 25 %
 ~~~
 
-<h3 align="center"></h3>
+<h3 align="center">Avanced Usage</h3>
 
+~~~python
+
+# First import SafePass module from SafePassPy
+from SafePassPy import SafePass
+
+# Create class object named 'password_checker'
+# insert the password you'd like to check
+password_checker = SafePass.SafePass("1234567890")
+
+# Print out the short answer from the returned output
+# NOTE : 'check_password_breaches' return a dictionary. check the examples directory 
+print(password_checker.check_password_breaches["is_password_breached"])
+
+# print out the crack time for your password in a human-readable format
+print(password_checker.estimate_brute_force_time())
+
+~~~
+
+<h6>OUTPUT</h6>
+
+~~~
+ True
+
+ 3 days
+~~~
+
+<h3 align="center">License</h3>
+<h6>This project is published under MIT License </h6>
+
+~~~
+MIT License
+
+Copyright (c) 2023 Aymen Brahim Djelloul
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+~~~
 
