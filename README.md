@@ -1,7 +1,5 @@
 <h1 align="center">SafePassPy</h1>
 
-<br>
-
 <p>SafePassPy is a pure-python library used to secure passwords and determine the strength percentage of password also check the passwords breachs, and much more tools</p>
 
 <h2 align="center">Features</h2>
