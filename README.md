@@ -12,11 +12,11 @@
 - [x] Make your password more secure and complex with Password salting feature
 - [x] Generate a strong random passwords for you
 
-<h3 align="center">How It's work ?</h3>
+<h2 align="center">How It's work ?</h2>
 <p>SafePassPy uses multiple methods to make you satisfied and feel secure, it uses multiple password measures that have been authorized from specialists in IT and Cyber-Security
 like Avast and Google, also SafePassPy uses a large passwords database to check password breachs through it</p>
 
-<h3 align="center">Simple Usage</h3>
+<h2 align="center">Simple Usage</h2>
 
 ~~~python
 # First import SafePass module from SafePassPy
@@ -37,7 +37,7 @@ print(f"{password_checker.get_password_strength_percent} %")
  25 %
 ~~~
 
-<h3 align="center">Advanced Usage</h3>
+<h2 align="center">Advanced Usage</h2>
 
 ~~~python
 
@@ -65,7 +65,7 @@ print(password_checker.estimate_brute_force_time())
  3 days
 ~~~
 
-<h3 align="center">License</h3>
+<h2 align="center">License</h2>
 <h6>This project is published under MIT License </h6>
 
 ~~~
