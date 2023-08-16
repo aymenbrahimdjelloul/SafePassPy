@@ -9,9 +9,27 @@
 - [x] Make your password more secure and complex with Password salting feature
 - [x] Generate a strong random passwords for you
 
-<h3 align="center" style="color: blue;">How It's work ?</h3>
+<h3 align="center">How It's work ?</h3>
 <p>SafePassPy uses multiple methods to make you satisfied and feel secure, it uses multiple password measures that have been authorized from specialists in IT and Cyber-Security
 like Avast and Google, also SafePassPy uses a large passwords database to check password breachs through it</p>
 
-<h3></h3>
- 
+<h3 align="center">Usage</h3>
+
+~~~python
+# First import SafePass module from SafePassPy
+from SafePassPy import SafePass
+
+# Create class object named 'password_checker'
+# insert the password you'd like to check
+password_checker = SafePass.SafePass("1234567890")
+
+# Print out your password strength precentage
+print(f"{password_checker.get_password_strength_percent} %")
+
+~~~
+
+~~~
+# OUTPUT : 25 %
+~~~
+
+
