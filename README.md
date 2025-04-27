@@ -1,48 +1,18 @@
-## Overview
-<p>SecurePass is a pure-python library used to secure passwords and determine the strength percentage of password also check the passwords breachs, and much more tools</p>
+# **SecurePass: A Python Library for Password Security**
 
-## Features :
-- [x] Determine Password strength percentage
-- [x] Check your password for password breach through large passwords database 
-- [x] Estimated the time to crack your password
-- [x] Make your password more secure and complex with Password salting feature
-- [x] Generate a strong random passwords for you
+**SecurePass** is a Python library designed to enhance password security by providing tools to assess password strength, detect breaches, and improve security through password salting, random generation, and more. It's simple to integrate into your projects, making it easy to ensure that your passwords are secure.
 
-## How It's work ?
-<p>SecurePass uses multiple methods to make you satisfied and feel secure, it uses multiple password measures that have been authorized from specialists in IT and Cyber-Security
-like Avast and Google, also SecurePass uses a large passwords database to check password breachs through it</p>
+## **Key Features:**
+- **Password Strength Assessment**: Evaluates your password’s strength and provides a percentage rating based on established security metrics.
+- **Breach Detection**: Checks your password against a large, constantly updated database of breached passwords.
+- **Password Crack Time Estimation**: Estimates how long it would take for a password to be cracked through brute-force or other methods.
+- **Password Salting**: Adds a random string (salt) to your password before hashing to prevent rainbow table attacks.
+- **Random Password Generator**: Generates strong, random passwords with a specified level of complexity.
 
-### Simple Usage :
+## **Installation**
 
-~~~python
+SecurePass is easy to install via **pip**. To get started, simply run the following command:
 
 ~~~
-
-### Advanced Usage :
-
-~~~python
-
-
+pip install securepass
 ~~~
-
-
-## License :
-##### This project is published under MIT License
-
-~~~
-MIT License
-
-Copyright (c) 2023 Aymen Brahim Djelloul
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-~~~
-
