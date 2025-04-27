@@ -1,20 +1,18 @@
-<h1 align="center">SafePassPy</h1>
-
+## Overview
 <p>SafePassPy is a pure-python library used to secure passwords and determine the strength percentage of password also check the passwords breachs, and much more tools</p>
 
-<h2 align="center">Features</h2>
-
+## Features :
 - [x] Determine Password strength percentage
 - [x] Check your password for password breach through large passwords database 
 - [x] Estimated the time to crack your password
 - [x] Make your password more secure and complex with Password salting feature
 - [x] Generate a strong random passwords for you
 
-<h2 align="center">How It's work ?</h2>
+## How It's work ?
 <p>SafePassPy uses multiple methods to make you satisfied and feel secure, it uses multiple password measures that have been authorized from specialists in IT and Cyber-Security
 like Avast and Google, also SafePassPy uses a large passwords database to check password breachs through it</p>
 
-<h2 align="center">Simple Usage</h2>
+## Simple Usage :
 
 ~~~python
 # First import SafePass module from SafePassPy
@@ -29,13 +27,13 @@ print(f"{password_checker.get_password_strength_percent} %")
 
 ~~~
 
-<h6>OUTPUT</h6>
+### OUTPUT
 
 ~~~
  25 %
 ~~~
 
-<h2 align="center">Advanced Usage</h2>
+## Advanced Usage :
 
 ~~~python
 
@@ -63,7 +61,7 @@ print(password_checker.estimate_brute_force_time())
  3 days
 ~~~
 
-<h2 align="center">License</h2>
+## License :
 <h6>This project is published under MIT License </h6>
 
 ~~~
