@@ -15,15 +15,6 @@ like Avast and Google, also SafePassPy uses a large passwords database to check 
 ## Simple Usage :
 
 ~~~python
-# First import SafePass module from SafePassPy
-from SafePassPy import SafePass
-
-# Create class object named 'password_checker'
-# insert the password you'd like to check
-password_checker = SafePass.SafePass("1234567890")
-
-# Print out your password strength precentage
-print(f"{password_checker.get_password_strength_percent} %")
 
 ~~~
 
@@ -37,29 +28,9 @@ print(f"{password_checker.get_password_strength_percent} %")
 
 ~~~python
 
-# First import SafePass module from SafePassPy
-from SafePassPy import SafePass
-
-# Create class object named 'password_checker'
-# insert the password you'd like to check
-password_checker = SafePass.SafePass("1234567890")
-
-# Print out the short answer from the returned output
-# NOTE : 'check_password_breaches' return a dictionary. check the examples directory 
-print(password_checker.check_password_breaches["is_password_breached"])
-
-# print out the crack time for your password in a human-readable format
-print(password_checker.estimate_brute_force_time())
 
 ~~~
 
-<h6>OUTPUT</h6>
-
-~~~
- True
-
- 3 days
-~~~
 
 ## License :
 ##### This project is published under MIT License
