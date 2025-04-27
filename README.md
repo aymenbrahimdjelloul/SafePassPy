@@ -1,5 +1,5 @@
 ## Overview
-<p>SafePassPy is a pure-python library used to secure passwords and determine the strength percentage of password also check the passwords breachs, and much more tools</p>
+<p>SecurePass is a pure-python library used to secure passwords and determine the strength percentage of password also check the passwords breachs, and much more tools</p>
 
 ## Features :
 - [x] Determine Password strength percentage
@@ -9,8 +9,8 @@
 - [x] Generate a strong random passwords for you
 
 ## How It's work ?
-<p>SafePassPy uses multiple methods to make you satisfied and feel secure, it uses multiple password measures that have been authorized from specialists in IT and Cyber-Security
-like Avast and Google, also SafePassPy uses a large passwords database to check password breachs through it</p>
+<p>SecurePass uses multiple methods to make you satisfied and feel secure, it uses multiple password measures that have been authorized from specialists in IT and Cyber-Security
+like Avast and Google, also SecurePass uses a large passwords database to check password breachs through it</p>
 
 ### Simple Usage :
 
