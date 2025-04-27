@@ -31,7 +31,7 @@ pip install securepass
 - [x] Random Password Generation: SecurePass includes a built-in function to generate secure passwords with customizable length and complexity requirements, ensuring they are strong and resistant to attacks.
 
 
-### Simple Usage Example:
+## Simple Usage Example:
 
 ~~~python
 # import the SecurePass class
