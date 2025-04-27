@@ -12,19 +12,13 @@
 <p>SafePassPy uses multiple methods to make you satisfied and feel secure, it uses multiple password measures that have been authorized from specialists in IT and Cyber-Security
 like Avast and Google, also SafePassPy uses a large passwords database to check password breachs through it</p>
 
-## Simple Usage :
+### Simple Usage :
 
 ~~~python
 
 ~~~
 
-### OUTPUT
-
-~~~
- 25 %
-~~~
-
-## Advanced Usage :
+### Advanced Usage :
 
 ~~~python
 
