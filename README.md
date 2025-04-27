@@ -62,7 +62,7 @@ print(password_checker.estimate_brute_force_time())
 ~~~
 
 ## License :
-<h6>This project is published under MIT License </h6>
+##### This project is published under MIT License
 
 ~~~
 MIT License
