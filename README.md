@@ -103,34 +103,25 @@ copies or substantial portions of the Software.
 
 ~~~
 
-
-### Why Use SecurePass?
+## Why Use SecurePass?
 Comprehensive Security: SecurePass covers all critical aspects of password security, from strength assessment to breach detection.
-
 Ease of Use: With an intuitive and simple API, SecurePass is straightforward to integrate into any project.
-
 Robust Features: SecurePass offers strong password salting, random generation, and secure password checking to ensure your passwords are as safe as possible.
 
-### Contribute
+## Contribute
+
 We welcome contributions to SecurePass! Whether you're reporting a bug, suggesting a feature, or submitting code, your contributions are valuable. To get started:
-
 Fork the repository.
-
 Create a new branch for your changes.
-
 Make your changes and ensure the tests pass.
-
 Submit a pull request with a detailed description of your changes.
-
 We appreciate your help in improving the project!
 
-### Thanks
+## Thanks
+
 We would like to thank the following individuals and organizations for their contributions to this project:
-
 Cybersecurity Experts: For providing guidelines and best practices that SecurePass follows.
-
 Open Source Contributors: Who have contributed their time and expertise to enhance the security of this library.
-
 Thank you for using SecurePass! Stay safe and secure online!
 
 
