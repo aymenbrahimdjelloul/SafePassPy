@@ -821,7 +821,7 @@ class CLI:
 
         {__Colors__.WHITE}\\help{__Colors__.GREEN} - Show this help message
         {__Colors__.WHITE}\\version{__Colors__.GREEN} - Show version information
-        {__Colors__.WHITE}\\about{__Colors__.GREEN} - Show information about HashRipper
+        {__Colors__.WHITE}\\about{__Colors__.GREEN} - Show information about SecurePass
         {__Colors__.WHITE}\\exit, \\quit, \\q{__Colors__.GREEN} - Exit the application
         """
 
@@ -871,16 +871,19 @@ class CLI:
             # Process each entry with appropriate formatting and coloring
             for key, value in result.items():
                 # Transform key names for better readability
-                display_key = key
+                display_key: str = key
 
                 if key == "password":
-                    display_key = "Key"
+
+                    display_key: str = "Password"
                     key_color = __Colors__.CYAN
                     value_color = __Colors__.WHITE
+                    value: str = f"'{value}'"
 
                 elif key == "entropy_value":
-                    display_key = "Entropy"
-                    key_color = __Colors__.CYAN
+
+                    display_key: str = "Entropy"
+                    key_color: str = __Colors__.CYAN
                     if value < 40:
                         value_color = __Colors__.RED
                     elif value < 60:
@@ -888,17 +891,19 @@ class CLI:
                     else:
                         value_color = __Colors__.GREEN
                 elif key == "score" or "risk" in key:
-                    display_key = "Score" if key == "score" else "Risk"
+
+                    display_key: str = "Score" if key == "score" else "Risk"
                     key_color = __Colors__.CYAN
                     if value >= 7:
                         value_color = __Colors__.RED
                     elif value >= 4:
-                        value_color = __Colors__.YELLOW
+                        value_color: str = __Colors__.YELLOW
                     else:
-                        value_color = __Colors__.GREEN
+                        value_color: str = __Colors__.GREEN
 
                 elif key == "estimated_brute_force":
-                    display_key = "Estimated Brute Force"
+
+                    display_key: str = "Estimated Brute-Force"
                     key_color = __Colors__.CYAN
                     if "instantly" in str(value).lower() or "seconds" in str(value).lower() or "minutes" in str(
                             value).lower():
@@ -909,9 +914,17 @@ class CLI:
                         value_color = __Colors__.GREEN
 
                 elif key == "breaches_check":
+
                     display_key = "Breaches Check"
                     key_color = __Colors__.CYAN
-                    value_color = __Colors__.RED if value else __Colors__.GREEN
+                    if value:
+                        value = "Yes"
+                        value_color = __Colors__.RED
+
+                    else:
+                        value = "You're clean from breaches"
+                        value_color = __Colors__.GREEN
+
                 elif key == "feedback":
 
                     display_key = "Feedback"
