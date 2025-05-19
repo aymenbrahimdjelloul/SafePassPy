@@ -1,12 +1,12 @@
 """
 This code or file is part of 'SecurePass' project
-copyright (c) 2025, Aymen Brahim Djelloul, All rights reserved.
+copyright (c) 2023-2025, Aymen Brahim Djelloul, All rights reserved.
 use of this source code is governed by MIT License that can be found on the project folder.
 
 
 @author : Aymen Brahim Djelloul
-date : 14.08.2023 -> 27.04.2025 (Updated version)
-version : 1.0
+date : 14.08.2023 -> 19.05.2025 (Updated version)
+version : 1.1
 License : MIT
 
 
@@ -28,44 +28,83 @@ License : MIT
 
 
 """
-
 # IMPORTS
 import sys
 import re
+import os
+import socket
 import string
 import secrets
+import colorama
 import requests
-import socket
 from math import ceil
 from collections import Counter
-from time import perf_counter
+from time import perf_counter, sleep
 from typing import Dict, Optional, List, Tuple
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
 
-class __Core:
+# Define Coloring sets
+try:
 
+    import colorama
+    from colorama import Fore, Style
+
+    class __Colors__:
+        """ Define colors variable using colorama """
+
+        CYAN = Fore.CYAN
+        GREEN = Fore.GREEN
+        YELLOW = Fore.YELLOW
+        RED = Fore.RED
+        WHITE = Fore.WHITE
+        BLUE = Fore.BLUE
+        MAGNETA = Fore.MAGENTA
+        BRIGHT = Style.BRIGHT
+        RESET_ALL = Style.RESET_ALL
+
+except ImportError:
+
+    # Set colorama as None
+    colorama: bool = None
+
+    # Define ANSI Coloros
+    class __Colors__:
+        """ Define ANSI colors code as exception in case not 'colorama' presence"""
+
+        CYAN: str = '\033[96m'
+        GREEN: str = '\033[92m'
+        YELLOW: str = '\033[93m'
+        RED: str = '\033[91m'
+        WHITE: str = '\033[37m'
+        BLUE: str = '\033[94m'
+        MAGNETA: str = '\033[95m'
+        BRIGHT: str = '\033[1m'
+        RESET_ALL: str = '\033[0m'
+
+
+class __Core__:
     # DEFINE ALL SecurePass constant in Core parent class
     # DEFINE GLOBAL VARIABLES
     # AUTHOR: str = "Aymen Brahim Djelloul"
-    VERSION: float = 1.0
+    VERSION: float = 1.1
+    DATE: str = "19.05.2025"
 
     # Character sets
-    LOWERCASE = string.ascii_lowercase
-    UPPERCASE = string.ascii_uppercase
-    DIGITS = string.digits
-    SPECIAL = "!@#$%^&*()-_=+[]{}|;:,.<>?/"
+    _LOWERCASE: str = string.ascii_lowercase
+    _UPPERCASE: str = string.ascii_uppercase
+    _DIGITS: str = string.digits
+    _SPECIAL: str = "!@#$%^&*()-_=+[]{}|;:,.<>?/"
 
-    SEQUENCES = {
+    SEQUENCES: dict = {
         'alphabetic': 'abcdefghijklmnopqrstuvwxyz',
         'numeric': '0123456789',
         'qwerty': 'qwertyuiopasdfghjklzxcvbnm'
     }
 
 
-class PasswordGenerator(__Core):
-
+class PasswordGenerator(__Core__):
     """
     PasswordGenerator is a simple integrated tool for password generating
 
@@ -76,17 +115,17 @@ class PasswordGenerator(__Core):
     """
 
     # Default word lists for memorable passwords
-    DEFAULT_ADJECTIVES = [
+    DEFAULT_ADJECTIVES: tuple[str] = (
         "happy", "brave", "calm", "swift", "bright", "wise", "keen",
         "bold", "fair", "kind", "smart", "proud", "grand", "fresh"
-    ]
+    )
 
-    DEFAULT_NOUNS = [
+    DEFAULT_NOUNS: tuple[str] = (
         "tiger", "river", "cloud", "ocean", "eagle", "dream", "planet",
         "forest", "castle", "dragon", "sunset", "mountain", "garden", "thunder"
-    ]
+    )
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Default configuration
         # self.config = {
         #     "length": 16,
@@ -103,7 +142,7 @@ class PasswordGenerator(__Core):
         #     "exclude_patterns": [],  # Regular expressions for patterns to avoid
         # }
 
-        self.config = {
+        self.config: dict = {
             "length": 16,
             "use_lowercase": True,
             "use_uppercase": True,
@@ -117,14 +156,14 @@ class PasswordGenerator(__Core):
             "exclude_chars": "",  # Characters to exclude
             "exclude_patterns": [],  # Regular expressions for patterns to avoid
             "memorable": {
-            "adjectives": self.DEFAULT_ADJECTIVES,
-            "nouns": self.DEFAULT_NOUNS,
-            "num_digits": 2,
-            "num_special": 1
+                "adjectives": self.DEFAULT_ADJECTIVES,
+                "nouns": self.DEFAULT_NOUNS,
+                "num_digits": 2,
+                "num_special": 1
             }}
 
         # Similar looking characters
-        self.similar_chars = "il1IoO0"
+        self.similar_chars: str = "il1IoO0"
 
     def configure(self, **kwargs) -> None:
         """Update configuration with provided parameters."""
@@ -140,7 +179,7 @@ class PasswordGenerator(__Core):
     def _validate_config(self) -> None:
         """Validate the current configuration."""
         # Check if length is enough to satisfy minimum requirements
-        min_chars = (
+        min_chars: tuple = (
                 (self.config["min_lowercase"] if self.config["use_lowercase"] else 0) +
                 (self.config["min_uppercase"] if self.config["use_uppercase"] else 0) +
                 (self.config["min_digits"] if self.config["use_digits"] else 0) +
@@ -164,16 +203,16 @@ class PasswordGenerator(__Core):
 
     def _get_allowed_chars(self) -> str:
         """Get allowed characters based on current configuration."""
-        allowed = ""
+        allowed: str = ""
 
         if self.config["use_lowercase"]:
-            allowed += self.LOWERCASE
+            allowed += self._LOWERCASE
         if self.config["use_uppercase"]:
-            allowed += self.UPPERCASE
+            allowed += self._UPPERCASE
         if self.config["use_digits"]:
-            allowed += self.DIGITS
+            allowed += self._DIGITS
         if self.config["use_special"]:
-            allowed += self.SPECIAL
+            allowed += self._SPECIAL
 
         # Remove excluded characters
         for char in self.config["exclude_chars"]:
@@ -188,12 +227,13 @@ class PasswordGenerator(__Core):
 
     def _meets_requirements(self, password: str) -> bool:
         """Check if the password meets all specified requirements."""
+
         # Count character types
-        counts = {
-            "lowercase": sum(1 for c in password if c in self.LOWERCASE),
-            "uppercase": sum(1 for c in password if c in self.UPPERCASE),
-            "digits": sum(1 for c in password if c in self.DIGITS),
-            "special": sum(1 for c in password if c in self.SPECIAL),
+        counts: dict = {
+            "lowercase": sum(1 for c in password if c in self._LOWERCASE),
+            "uppercase": sum(1 for c in password if c in self._UPPERCASE),
+            "digits": sum(1 for c in password if c in self._DIGITS),
+            "special": sum(1 for c in password if c in self._SPECIAL),
         }
 
         # Check minimum requirements
@@ -217,7 +257,7 @@ class PasswordGenerator(__Core):
         """ This method will generate random password"""
 
         """Generate a password based on the current configuration."""
-        allowed_chars = self._get_allowed_chars()
+        allowed_chars: str = self._get_allowed_chars()
 
         if not allowed_chars:
             raise ValueError("No valid characters available with current configuration")
@@ -240,24 +280,24 @@ class PasswordGenerator(__Core):
         Format: Adjective + Noun + Digits + Special (e.g., HappyTiger42!)
         """
         # Get adjective and noun from configured lists
-        adjective = secrets.choice(self.config["memorable"]["adjectives"])
-        noun = secrets.choice(self.config["memorable"]["nouns"])
+        adjective: str = secrets.choice(self.config["memorable"]["adjectives"])
+        noun: str = secrets.choice(self.config["memorable"]["nouns"])
 
         # Capitalize first letter of each word for readability and security
-        adjective = adjective[0].upper() + adjective[1:]
-        noun = noun[0].upper() + noun[1:]
+        adjective: str = adjective[0].upper() + adjective[1:]
+        noun: str = noun[0].upper() + noun[1:]
 
         # Add random digits
         num_digits = self.config["memorable"]["num_digits"]
-        digits = ''.join(secrets.choice(self.DIGITS) for _ in range(num_digits))
+        digits = ''.join(secrets.choice(self._DIGITS) for _ in range(num_digits))
 
         # Add random special characters
-        num_special = self.config["memorable"]["num_special"]
-        special_chars = self.SPECIAL
-        special = ''.join(secrets.choice(special_chars) for _ in range(num_special))
+        num_special: str = self.config["memorable"]["num_special"]
+        special_chars: str = self._SPECIAL
+        special: str = ''.join(secrets.choice(special_chars) for _ in range(num_special))
 
         # Combine all parts
-        password = adjective + noun + digits + special
+        password: str = adjective + noun + digits + special
 
         return password
 
@@ -267,9 +307,10 @@ class PasswordGenerator(__Core):
         return ''.join(str(secrets.randbelow(10)) for _ in range(length))
 
 
-class SecurePass(__Core):
+class SecurePass(__Core__):
     """
-    A class used to represent a secure password and estimate the time it would take to crack the password using brute force.
+    A class used to represent a secure password and estimate the time
+     it would take to crack the password using brute-force .
 
     Attributes:
         password (str): The password string to be analyzed.
@@ -282,46 +323,47 @@ class SecurePass(__Core):
 
 
     Usage Example:
-        >>> secure_pass = SecurePass("MyS3cureP@ssw0rd!")
-        >>> secure_pass.estimate_brute_force()
+        # >>> secure_pass = SecurePass("MyS3cureP@ssw0rd!")
+        # >>> secure_pass.estimate_brute_force()
         "approximately 5 days"
     """
-    
+
     # Define constants
     __MIN_PASSWORD_LEN: int = 8
     __REQUEST_TIMEOUT: int = 5
 
     # Default performance-optimized headers
     __DEFAULT_HEADERS: dict = {
-            'User-Agent': 'OptimizedRequester/1.0',
-            'Accept-Encoding': 'gzip, deflate',
-            'Connection': 'keep-alive',
-            'Cache-Control': 'max-age=3600'
-        }
+        'User-Agent': 'OptimizedRequester/1.0',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive',
+        'Cache-Control': 'max-age=3600'
+    }
 
     # DEFINE 3 WORDLIST URL TO GET
     __SEARCH_WORDLIST: str = "https://raw.githubusercontent.com/berzerk0/Probable-Wordlists/refs/heads/master/Real-Passwords/Top12Thousand-probable-v2.txt"
     __DEEP_SEARCH_WORDLIST: str = "https://raw.githubusercontent.com/berzerk0/Probable-Wordlists/refs/heads/master/Real-Passwords/Top304Thousand-probable-v2.txt"
 
     def __init__(self, password: str | bytes, wordlist: str | None = None, deep_search: bool = False) -> None:
-        
+
         # Initialize values
-        self.password = password if isinstance(password, str) else password.decode("UTF-8")
-        self.breaches_count: int = 300.000 if deep_search else 12.000
-        self.__custom_wordlist = wordlist
-        self.__deep_search = deep_search
-        self.__wordlist: set = {}
-        self.__is_offline: bool = False
-        
+        self.password: str = password if isinstance(password, str) else password.decode("UTF-8")
+        self._custom_wordlist: str = wordlist
+        self._deep_search: bool = deep_search
+        self._wordlist: set = {}
+        self._is_offline: bool = False
+
         # Check for online connection
         if self.__is_connected():
-            self.__wordlist = self.__load_wordlists()
+            self._wordlist = self.__load_wordlists()
 
+        self.breaches_count: int = len(self._wordlist)
+        # self.breaches_count: int = 300000 if deep_search else 12000
         # print(self.__wordlist)
 
     def update(self, password: str | bytes) -> None:
         """ This method will update the password to SecurePass object"""
-        self.password = password if isinstance(password, str) else password.decode("UTF-8")
+        self.password: str = password if isinstance(password, str) else password.decode("UTF-8")
 
     @property
     def password_analysis(self) -> dict:
@@ -332,28 +374,30 @@ class SecurePass(__Core):
                 "estimated_brute_force": self.estimate_brute_force(),
                 "breaches_check": self.check_password_breaches,
                 "feedback": self.get_feedback,
-                "securepass_version": self.VERSION}
+                "securepass_version": self.VERSION
+                }
 
     @property
     def password_entropy(self) -> float:
         """Calculate password entropy in bits."""
+
         # Count the character set size based on the characters used
-        char_sets = {
-            "lowercase": any(c in self.LOWERCASE for c in self.password),
-            "uppercase": any(c in self.UPPERCASE for c in self.password),
-            "digits": any(c in self.DIGITS for c in self.password),
-            "special": any(c in self.SPECIAL for c in self.password),
+        char_sets: dict = {
+            "lowercase": any(c in self._LOWERCASE for c in self.password),
+            "uppercase": any(c in self._UPPERCASE for c in self.password),
+            "digits": any(c in self._DIGITS for c in self.password),
+            "special": any(c in self._SPECIAL for c in self.password),
         }
 
         charset_size = 0
         if char_sets["lowercase"]:
-            charset_size += len(self.LOWERCASE)
+            charset_size += len(self._LOWERCASE)
         if char_sets["uppercase"]:
-            charset_size += len(self.UPPERCASE)
+            charset_size += len(self._UPPERCASE)
         if char_sets["digits"]:
-            charset_size += len(self.DIGITS)
+            charset_size += len(self._DIGITS)
         if char_sets["special"]:
-            charset_size += len(self.SPECIAL)
+            charset_size += len(self._SPECIAL)
 
         # Calculate entropy: log2(charset_size^length)
         return len(self.password) * (charset_size.bit_length() - 1)
@@ -363,7 +407,7 @@ class SecurePass(__Core):
         """ This method will analyze and calculate the password strength percentage"""
 
         # First get Define variables to get password specifications
-        password_specs = {
+        password_specs: dict = {
             "password_length": len(self.password) * 2,
             "uppercase_count": self.__uppercase_count(),
             "lowercase_count": self.__lowercase_count(),
@@ -392,7 +436,7 @@ class SecurePass(__Core):
     @property
     def check_password_breaches(self) -> bool:
         """ This method check the password if there is breaches"""
-        return True if self.password in self.__wordlist else False
+        return True if self.password in self._wordlist else False
 
     def estimate_brute_force(self, friendly_format: bool = True, attempts_per_seconds: int = 10 ** 6) -> int | str:
         """ This method will calculate the time it will take to crack the given password in seconds"""
@@ -402,7 +446,7 @@ class SecurePass(__Core):
             if not self.password or not isinstance(self.password, str):
                 raise ValueError("Password must be a non-empty string.")
 
-            password_length = len(self.password)
+            password_length: int = len(self.password)
 
             if password_length == 0:
                 raise ValueError("Password length cannot be zero.")
@@ -411,7 +455,7 @@ class SecurePass(__Core):
             if not isinstance(attempts_per_seconds, int) or attempts_per_seconds <= 0:
                 raise ValueError("Attempts per second must be a positive integer greater than zero.")
 
-            chars_set_size = 0
+            chars_set_size: int = 0
 
             # Calculate the character set size based on the password's character types
             if self.__digits_count() > 0:
@@ -428,8 +472,8 @@ class SecurePass(__Core):
                 raise ValueError("Password contains no valid characters to brute-force.")
 
             # Calculate the number of possible combinations and estimated time
-            possible_combinations = chars_set_size ** password_length
-            estimated_time_seconds = possible_combinations // attempts_per_seconds  # Integer division
+            possible_combinations: int = chars_set_size ** password_length
+            estimated_time_seconds: int = possible_combinations // attempts_per_seconds  # Integer division
 
             # Return the estimated time in a human-readable format or in raw seconds
             return self.__readable_time(estimated_time_seconds) if friendly_format else estimated_time_seconds
@@ -438,7 +482,8 @@ class SecurePass(__Core):
             raise Exception(e)
 
     def password_salt(self, max_length: int = 16,
-                      salting_chars: tuple = tuple(char for char in string.ascii_letters + string.digits + string.punctuation)) -> str:
+                      salting_chars: tuple = tuple(
+                          char for char in string.ascii_letters + string.digits + string.punctuation)) -> str:
         """This method will salt the given password to make it stronger."""
 
         password_length: int = len(self.password)
@@ -447,7 +492,7 @@ class SecurePass(__Core):
             return self.password
 
         # Generate the password salt
-        salt = [secrets.choice(salting_chars) for _ in range(max_length - password_length)]
+        salt: list = [secrets.choice(salting_chars) for _ in range(max_length - password_length)]
 
         # Return salted password
         return f"{self.password}{''.join(salt)}"
@@ -456,8 +501,8 @@ class SecurePass(__Core):
     def get_feedback(self) -> str:
         """ This method will get string feedback to the user to improve their password"""
 
-        feedback = []
-        password = self.password
+        feedback: list = []
+        password: str = self.password
 
         # Check length - quick and high impact
         if len(password) < 8:
@@ -466,21 +511,30 @@ class SecurePass(__Core):
             feedback.append("at least 12 characters for security.")
 
         # Character variety checks - use regex for efficiency
-        has_lowercase = bool(re.search(r'[a-z]', password))
-        has_uppercase = bool(re.search(r'[A-Z]', password))
-        has_digit = bool(re.search(r'\d', password))
-        has_special = bool(re.search(r'[^a-zA-Z0-9]', password))
+        has_lowercase: bool = bool(re.search(r'[a-z]', password))
+        has_uppercase: bool = bool(re.search(r'[A-Z]', password))
+        has_digit: bool = bool(re.search(r'\d', password))
+        has_special: bool = bool(re.search(r'[^a-zA-Z0-9]', password))
 
         # Calculate variety score
-        variety_score = sum([has_lowercase, has_uppercase, has_digit, has_special])
+        variety_score: int = sum([has_lowercase, has_uppercase, has_digit, has_special])
 
         # Variety feedback
         if variety_score < 4:
-            missing = []
-            if not has_lowercase: missing.append("lowercase letters")
-            if not has_uppercase: missing.append("uppercase letters")
-            if not has_digit: missing.append("numbers")
-            if not has_special: missing.append("special characters")
+            missing: list = []
+
+            if not has_lowercase:
+                missing.append("lowercase letters")
+
+            if not has_uppercase:
+                missing.append("uppercase letters")
+
+            if not has_digit:
+                missing.append("numbers")
+
+            if not has_special:
+                missing.append("special characters")
+
             feedback.append(f"Add {', '.join(missing)} to improve strength.")
 
         # Check for repetitive patterns more efficiently
@@ -494,7 +548,7 @@ class SecurePass(__Core):
             feedback.append("Avoid repeating characters (like 'aaa' or '111').")
 
         # Check for sequential patterns more efficiently
-        lower_pwd = password.lower()
+        lower_pwd: str = password.lower()
 
         for seq_type, seq in self.SEQUENCES.items():
             for i in range(len(seq) - 2):
@@ -538,7 +592,7 @@ class SecurePass(__Core):
         if time_seconds < 1:
             return "instantly"
 
-        units = [
+        units: list[tuple] = [
             (60, "second", "seconds"),
             (60, "minute", "minutes"),
             (24, "hour", "hours"),
@@ -580,7 +634,7 @@ class SecurePass(__Core):
 
     def __symbols_count(self) -> int:
         """Count symbol characters in the password (1 point each)."""
-        symbols = set(".,?!@#$%^&*()_-+=|")
+        symbols: set[str] = set(".,?!@#$%^&*()_-+=|")
         return sum(1 for char in self.password if char in symbols)
 
     def __is_blank_spaced(self) -> bool:
@@ -599,19 +653,20 @@ class SecurePass(__Core):
             ValueError: If the custom wordlist URL is invalid or inaccessible.
             IOError: If there are issues reading the wordlist content.
         """
+
         try:
             # Determine which wordlist URL to use
-            if self.__deep_search:
-                url = self.__DEEP_SEARCH_WORDLIST
+            if self._deep_search:
+                url: str = self.__DEEP_SEARCH_WORDLIST
 
-            elif self.__custom_wordlist:
-                url = self.__custom_wordlist
+            elif self._custom_wordlist:
+                url: str = self._custom_wordlist
 
             else:
-                url = self.__SEARCH_WORDLIST
+                url: str = self.__SEARCH_WORDLIST
 
             # Attempt to fetch and process the wordlist
-            response = self.__get_request(url=url).text.split()
+            response: str = self.__get_request(url=url).text.split()
 
             # Check if the request was successful
             # if response.status_code != 200:
@@ -621,7 +676,8 @@ class SecurePass(__Core):
             # Using a set comprehension for better performance
             return set(response)
 
-        except (ConnectionError, ValueError, Exception):
+        except (ConnectionError, ValueError, Exception) as e:
+            print(e)
             return {}
 
     def __get_request(self, url: str, headers: Optional[Dict[str, str]] = None, timeout: int = 10) -> requests.Response:
@@ -638,7 +694,7 @@ class SecurePass(__Core):
         """
 
         # Merge provided headers with defaults
-        merged_headers = self.__DEFAULT_HEADERS.copy()
+        merged_headers: dict = self.__DEFAULT_HEADERS.copy()
         if headers:
             merged_headers.update(headers)
 
@@ -656,8 +712,8 @@ class SecurePass(__Core):
         # Apply retry strategy to both HTTP and HTTPS requests
         adapter = HTTPAdapter(
             max_retries=retry_strategy,
-            pool_connections=10,  # Number of connection pools to cache
-            pool_maxsize=10  # Maximum number of connections per pool
+            # pool_connections=10,  # Number of connection pools to cache
+            # pool_maxsize=10  # Maximum number of connections per pool
         )
         session.mount("http://", adapter)
         session.mount("https://", adapter)
@@ -676,6 +732,307 @@ class SecurePass(__Core):
         return response
 
 
+class CLI:
+    """
+    Command Line Interface for SecurePass application.
+
+    This class handles all terminal-based user interactions, including displaying
+    password security analysis results, processing user input, and providing
+    a colorful, user-friendly interface for the SecurePass tool.
+
+    The CLI class provides methods to format and display security check results
+    with appropriate colors and layouts based on severity levels. It handles
+    different output formats for various data types and provides visual cues
+    to help users quickly understand security information.
+    """
+
+    # IMPORTS
+    import shutil
+
+    # Define global constants
+    APP_CAPTION: str = f"SecurePass - v{__Core__.VERSION}"
+    TERMINAL_WIDTH: int = shutil.get_terminal_size(fallback=(80, 20)).columns
+    WAIT_TIME: int = 1
+    CURRENT_PLATFORM: str = sys.platform
+
+    def __init__(self) -> None:
+
+        # Check if colorama is present
+        if colorama:
+            colorama.init(autoreset=True)
+
+        # Set title
+        self._set_terminal_title()
+
+        # Create SecurePass object
+        self.securepass = SecurePass("", deep_search=True)
+
+    def _clear_screen(self) -> None:
+        """ This method will clear screen"""
+        os.system("cls" if self.CURRENT_PLATFORM == "win32" else "clear")
+
+    def _set_terminal_title(self) -> None:
+        """ This method will set a terminal title """
+        os.system(F"title {self.APP_CAPTION}") if self.CURRENT_PLATFORM == "win32"\
+            else sys.stdout.write(f"\33]0;{self.APP_CAPTION}\a"); sys.stdout.flush()
+
+    def _set_separator(self) -> None:
+        """ This method will set a separator """
+        print(f"{__Colors__.WHITE}{'─' * self.TERMINAL_WIDTH}{__Colors__.RESET_ALL}\n")
+
+    def _center_text(self, text: str) -> str:
+        """ This method will center text using terminal width"""
+        return text.center(self.TERMINAL_WIDTH)
+
+    def _print_header(self) -> None:
+        """ This method will print the app header"""
+
+        # Print header
+        print(f"\n{__Colors__.BRIGHT}{__Colors__.WHITE}{self._center_text(f"Welcome to {self.APP_CAPTION}")}\n")
+        # Set separator
+        self._set_separator()
+
+    @staticmethod
+    def _show_version() -> None:
+        """Display version information."""
+        print(f"\n  {__Colors__.BRIGHT}{__Colors__.CYAN}VERSION INFO:{__Colors__.RESET_ALL}")
+        print(f"  {__Colors__.GREEN}SecurePass v{__Core__.VERSION}")
+        print(f"  {__Colors__.GREEN}Build date: {__Core__.DATE}")
+
+    @staticmethod
+    def _get_user_input() -> str:
+        """ This method will return the captured user input"""
+        return str(input(f"{__Colors__.BRIGHT}  Your password : "))
+
+    def _wait_user_input(self) -> None:
+        """ This method will wait for user input"""
+
+        # wait enter input
+        input("\nPress enter to continue...\n")
+        # Sleep for 1 second
+        sleep(self.WAIT_TIME)
+
+    @staticmethod
+    def _show_help() -> None:
+        """Display help information."""
+
+        help_text = f"""
+        {__Colors__.BRIGHT}{__Colors__.CYAN}AVAILABLE COMMANDS:{__Colors__.RESET_ALL}
+
+        {__Colors__.WHITE}\\help{__Colors__.GREEN} - Show this help message
+        {__Colors__.WHITE}\\version{__Colors__.GREEN} - Show version information
+        {__Colors__.WHITE}\\about{__Colors__.GREEN} - Show information about HashRipper
+        {__Colors__.WHITE}\\exit, \\quit, \\q{__Colors__.GREEN} - Exit the application
+        """
+
+        print(help_text)
+
+    @staticmethod
+    def _show_about() -> None:
+        """Display information about the application."""
+
+        about_text = f"""
+        {__Colors__.BRIGHT}{Fore.CYAN}ABOUT SecurePass:{__Colors__.RESET_ALL}
+
+        {__Colors__.GREEN}Securepass is a powerful password checking software designed for
+        security, researchers, and system administrators.
+
+        {__Colors__.GREEN}Created by: Aymen Brahim Djelloul
+        look  : https://github.com/aymenbrahimdjelloul/Securepass
+        License : MIT
+            """
+
+        print(about_text)
+
+    def _show_result(self, result: dict) -> None:
+        """
+        Display the result of the securepass check in a clean, colorful, and readable format.
+
+        Args:
+            result (dict): Dictionary containing security check results
+        """
+
+        # Set separator
+        self._set_separator()
+
+        # Print header
+        print(f"{__Colors__.BRIGHT}{__Colors__.BLUE} SecurePass Security Check Results {__Colors__.RESET_ALL}\n")
+
+        # Show breach count with appropriate color
+        breach_count = self.securepass.breaches_count
+        count_color = __Colors__.RED if breach_count > 0 else __Colors__.GREEN
+        count_status = "VULNERABLE" if breach_count > 0 else "SECURE"
+        print(f"{__Colors__.BRIGHT}Breached count: {count_color}{breach_count} {count_status}{__Colors__.RESET_ALL}")
+
+        # Display details section
+        if result:
+            print(f"\n{__Colors__.BRIGHT}{__Colors__.BLUE}Details:{__Colors__.RESET_ALL}")
+
+            # Process each entry with appropriate formatting and coloring
+            for key, value in result.items():
+                # Transform key names for better readability
+                display_key = key
+
+                if key == "password":
+                    display_key = "Key"
+                    key_color = __Colors__.CYAN
+                    value_color = __Colors__.WHITE
+
+                elif key == "entropy_value":
+                    display_key = "Entropy"
+                    key_color = __Colors__.CYAN
+                    if value < 40:
+                        value_color = __Colors__.RED
+                    elif value < 60:
+                        value_color = __Colors__.YELLOW
+                    else:
+                        value_color = __Colors__.GREEN
+                elif key == "score" or "risk" in key:
+                    display_key = "Score" if key == "score" else "Risk"
+                    key_color = __Colors__.CYAN
+                    if value >= 7:
+                        value_color = __Colors__.RED
+                    elif value >= 4:
+                        value_color = __Colors__.YELLOW
+                    else:
+                        value_color = __Colors__.GREEN
+
+                elif key == "estimated_brute_force":
+                    display_key = "Estimated Brute Force"
+                    key_color = __Colors__.CYAN
+                    if "instantly" in str(value).lower() or "seconds" in str(value).lower() or "minutes" in str(
+                            value).lower():
+                        value_color = __Colors__.RED
+                    elif "hours" in str(value).lower() or "days" in str(value).lower():
+                        value_color = __Colors__.YELLOW
+                    else:
+                        value_color = __Colors__.GREEN
+
+                elif key == "breaches_check":
+                    display_key = "Breaches Check"
+                    key_color = __Colors__.CYAN
+                    value_color = __Colors__.RED if value else __Colors__.GREEN
+                elif key == "feedback":
+
+                    display_key = "Feedback"
+                    key_color = __Colors__.CYAN
+                    value_color = __Colors__.YELLOW
+
+                elif key == "securepass_version":
+                    # Replace securepass_version with timestamp
+                    from datetime import datetime
+                    display_key = "Report Time"
+                    key_color = __Colors__.CYAN
+                    value_color = __Colors__.WHITE
+                    # Generate current timestamp
+                    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    value = current_time
+
+                else:
+                    key_color = __Colors__.CYAN
+                    value_color = __Colors__.WHITE
+
+                # Format and print key-value pair
+                print(f"  {key_color}{display_key:<20} : {__Colors__.RESET_ALL} {value_color}", end="")
+
+                # Handle list values specially - print each item on a new line with bullets
+                if isinstance(value, list):
+                    print()
+                    if not value:
+                        print("[]")
+                    else:
+                        print()
+                        for item in value:
+                            if "weak" in str(item).lower() or "too short" in str(item).lower():
+                                item_color = __Colors__.RED
+                            elif "avoid" in str(item).lower() or "add" in str(item).lower():
+                                item_color = __Colors__.YELLOW
+                            else:
+                                item_color = __Colors__.WHITE
+                            print(f"    • {item_color}{item}{__Colors__.RESET_ALL}")
+                else:
+                    print(f"{value}{__Colors__.RESET_ALL}")
+        else:
+            print(f"\n{__Colors__.YELLOW}No detailed results available.{__Colors__.RESET_ALL}")
+
+        # Print footer
+        self._set_separator()
+
+    def run(self) -> None:
+        """ This method will run the entire CLI"""
+
+        while True:
+
+            # Clear screen
+            self._clear_screen()
+
+            # Set header
+            self._print_header()
+
+            # Set description text
+            print(f"{__Colors__.MAGNETA}Enter your password to get check report.{__Colors__.RESET_ALL}\n")
+            # Wait for user input
+            user_input: str = self._get_user_input()
+
+            # Check for commands
+            if user_input.lower() in ("?", "help", "\\help"):
+                self._show_help()
+
+                # Wait for user input
+                self._wait_user_input()
+                self.run()
+
+            elif user_input.lower() == "\\version":
+                self._show_version()
+
+                # Wait for user input
+                self._wait_user_input()
+                self.run()
+
+            elif user_input.lower() == "\\about":
+                self._show_about()
+
+                # Wait for user input
+                self._wait_user_input()
+                self.run()
+
+            elif user_input.lower() in ("quit", "exit", "q", "bye"):
+                print(f"{__Colors__.GREEN}{self.APP_CAPTION} is exiting.{__Colors__.RESET_ALL}")
+
+                # Wait for 1 second
+                sleep(self.WAIT_TIME)
+                sys.exit(0)
+
+            else:
+                # Other-wise if there is no command entered check the input as password
+                # Update password to SecurePass
+                self.securepass.update(user_input)
+
+                result: dict = self.securepass.password_analysis
+                self._show_result(result)
+
+                # Wait for input
+                self._wait_user_input()
+                # Wait for 1 second
+                sleep(self.WAIT_TIME)
+
+                self.run()
+
+
+def __main__() -> None:
+    """ This function will run the CLI"""
+
+    try:
+        cli = CLI()
+        cli.run()
+
+    except KeyboardInterrupt:
+        sys.exit(0)
+
+    # except Exception as exception:
+    #     print(exception)
+    #     sys.exit(1)
+
+
 if __name__ == "__main__":
-    sys.exit()
-    
+    __main__()
