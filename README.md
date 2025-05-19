@@ -1,5 +1,8 @@
 # **SecurePass: A pure-python module for password security**
 
+[![Download Latest 1.1](https://img.shields.io/badge/Download-Latest-brightgreen.svg)](https://github.com/aymenbrahimdjelloul/Securepass/releases/latest) 
+
+
 **SecurePass** is a Python library designed to enhance password security by providing tools to assess password strength, detect breaches, and improve security through password salting, random generation, and more. It's simple to integrate into your projects, making it easy to ensure that your passwords are secure.
 
 ## **Key Features:**
