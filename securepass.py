@@ -1029,9 +1029,9 @@ def __main__() -> None:
     except KeyboardInterrupt:
         sys.exit(0)
 
-    # except Exception as exception:
-    #     print(exception)
-    #     sys.exit(1)
+    except Exception as exception:
+        print(f"[ERROR] {exception}]")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
